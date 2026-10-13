@@ -16,6 +16,10 @@ import {
 } from "./providerStartupTimeout.js";
 import { mcpInputSchemaProfileSchema } from "./mcpInputSchemaProfile.js";
 import { mcpResponseBudgetSchema } from "./mcpResponseBudget.js";
+import {
+  binjaMcpTimeoutSchema,
+  binjaMcpUrlSchema,
+} from "./binjaMcpEndpoint.js";
 
 const environmentSchema = z.object({
   REA_ANALYSIS_PROVIDER: analysisProviderSelectorSchema.default("auto"),
@@ -26,6 +30,8 @@ const environmentSchema = z.object({
     .min(1)
     .refine(isAbsolute, "REA_IDA_MCP_CONFIG must be absolute")
     .optional(),
+  REA_BINJA_MCP_URL: binjaMcpUrlSchema.optional(),
+  REA_BINJA_MCP_TIMEOUT_MS: binjaMcpTimeoutSchema,
   GHIDRA_INSTALL_DIR: z
     .string()
     .min(1)

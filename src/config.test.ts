@@ -59,6 +59,54 @@ describe("runtime configuration", () => {
       expect(parseConfig({ REA_ANALYSIS_PROVIDER: invalid }).ok).toBe(false);
   });
 
+  it("admits only a credential-free loopback Binary Ninja MCP endpoint", () => {
+    for (const url of [
+      "http://127.0.0.1:24642/mcp",
+      "https://127.0.0.1:24642/mcp",
+      "http://[::1]:24642/mcp",
+    ])
+      expect(parseConfig({ REA_BINJA_MCP_URL: url })).toMatchObject({
+        ok: true,
+        value: { binjaMcpUrl: url },
+      });
+    for (const url of [
+      "http://localhost:24642/mcp",
+      "http://192.0.2.10:24642/mcp",
+      "http://example.com/mcp",
+      "http://user:secret@127.0.0.1:24642/mcp",
+      "http://127.0.0.1:24642/mcp?token=1",
+      "http://127.0.0.1:24642/mcp#view",
+      "ws://127.0.0.1:24642/mcp",
+      "file:///tmp/mcp",
+      "127.0.0.1:24642/mcp",
+      "",
+    ]) {
+      const rejected = parseConfig({ REA_BINJA_MCP_URL: url });
+      if (rejected.ok) throw new Error(`Unexpectedly accepted ${url}`);
+      expect(rejected.error.settings).toMatchObject([
+        { setting: "REA_BINJA_MCP_URL" },
+      ]);
+      // The constraint, never the rejected value, is reported.
+      expect(
+        JSON.stringify(projectAnalysisError(rejected.error)),
+      ).not.toContain("secret");
+    }
+    const unset = parseConfig({});
+    if (!unset.ok) throw unset.error;
+    expect(unset.value.binjaMcpUrl).toBeUndefined();
+  });
+
+  it("bounds the Binary Ninja request deadline to a schedulable timer", () => {
+    const defaults = parseConfig({});
+    if (!defaults.ok) throw defaults.error;
+    expect(defaults.value.binjaMcpTimeoutMs).toBe(900_000);
+    expect(
+      parseConfig({ REA_BINJA_MCP_TIMEOUT_MS: "2147483647" }),
+    ).toMatchObject({ ok: true, value: { binjaMcpTimeoutMs: 2_147_483_647 } });
+    for (const invalid of ["0", "0900", "15s", "-1", "1.5", "", "2147483648"])
+      expect(parseConfig({ REA_BINJA_MCP_TIMEOUT_MS: invalid }).ok).toBe(false);
+  });
+
   it("parses absolute BYO Ghidra and optional Java paths", () => {
     expect(
       parseConfig({

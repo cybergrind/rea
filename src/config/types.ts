@@ -10,6 +10,8 @@ export interface AppConfig {
   readonly mcpInputSchemaProfile?: McpInputSchemaProfile;
   readonly analysisProvider: AnalysisProviderSelector;
   readonly idaMcpConfigPath?: string;
+  readonly binjaMcpUrl?: string;
+  readonly binjaMcpTimeoutMs: number;
   readonly ghidraInstallDir: string | undefined;
   readonly ghidraJavaHome: string | undefined;
   readonly ghidraStartupTimeoutMs: number;

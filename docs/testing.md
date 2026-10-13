@@ -223,7 +223,7 @@ The process-global Vitest configuration contract rejects new direct temporary-ro
 creation outside the workspace seam and its narrowly documented boundary/package
 exceptions.
 
-Real Hopper, Ghidra, IDA, browser, package, and managed-code claims belong to their
+Real Hopper, Ghidra, IDA, Binary Ninja, browser, package, and managed-code claims belong to their
 explicit `npm run verify:*` lanes. The reconstruction-readiness lane also
 checks deterministic rerun, tamper, and stale-input handling; those checks do
 not execute extracted JavaScript modules. When application runtime behavior is
@@ -708,6 +708,29 @@ other engine versions and architectures remain unverified; see the
 Native IDA MCP verification uses `"protocol": "native"` with an already-running native plugin and requires `--second-procedure other_function --second-marker unique_second_body_text` to exercise GUI function switching and a return to the first function. These options remain optional for other profiles. The literal marker must appear in the second function's pseudocode and be absent from the first. Native cloud/widget failures are reported without hidden retries.
 
 The initial Linux x64 IDA Free 9.4 run used native MCP 1.1.2 with a local navigation correction. Windows x64 verification uses **IDA Pro 9.3**, the two-function public fixture, and the shipped Windows `whoami.exe` application. The native plugin was built from upstream `c9d15d98e8a143fc74f6e14037c48f63889b6d6c`, including the merged navigation fix, with a local loopback-listener change. Production CLI/MCP parity, switching, identity and cleanup passed. Correctness and performance measurements are recorded in the [Windows native verification notes](https://github.com/morluto/rea/blob/main/experiments/analysis-efficiency/ida-native-windows.md). Stock 1.1.2 switching, native macOS, and Windows IDA Free remain unverified. See the [native bridge prerequisites](ida-provider.md#optional-native-ida-mcp-bridge).
+
+## Binary Ninja MCP adapter
+
+`npm run verify:binja -- --target /absolute/path/to/program --procedure 0x401000`
+uses a running Binary Ninja at `REA_BINJA_MCP_URL` whose active view holds the
+target. It installs and starts nothing, and it opens, saves, closes, and
+activates nothing. The lane invokes the production CLI dispatcher and connects
+the pinned MCP client SDK to the production REA server. It verifies function
+Evidence and CLI/MCP parity, function and address operations, malformed input,
+a refused mutation, and that the open items, their unsaved-change flags, and
+the active view are the same afterwards. Whole-database inventories run only
+with `--inventories`. `--report` writes private local observations with mode
+`0600`; the console summary contains no target paths or upstream output.
+
+Adapter tests cover reply parsing, pagination, target binding, active-view and
+image-base changes, cancellation, the read-only tool authority, search
+preselection, string decoding, and the operator tooling's lock, queue, and
+never-overwrite rules. Their producer fixture reproduces reply shapes observed
+from `binaryninja_ui_mcp` 0.1.0 with synthetic contents; replies of the three
+state-changing tools the database tool calls were not observed. None of this
+establishes real Binary Ninja operation: until `verify:binja` has been run and
+recorded for an engine version and host, real-provider coverage is unverified.
+See the [provider guide](binja-provider.md).
 
 ## DOS Ghidra analysis
 
