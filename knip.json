@@ -7,6 +7,9 @@
     "src/contracts/errorSchemas.ts",
     "src/evaluation/AgentEvaluationFixtures.ts",
     "src/application/RealHopperAssertions.ts",
+    "src/binja/operator/BinjaDatabaseTool.ts",
+    "src/binja/operator/BinjaExclusiveLock.ts",
+    "src/binja/operator/BinjaFetchLane.ts",
     "scripts/verify/termux/browser.mjs",
     "scripts/verify-real-ghidra-noreturn.mjs",
     "tests/processOwnershipRunner.ts"

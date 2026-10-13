@@ -162,6 +162,13 @@ export const providerCatalog = (sources) => {
       contracts: declaredContracts("ida", sources.idaProvider.IDA_OPERATIONS),
     },
     {
+      identity: sources.binjaProvider.BINJA_PROVIDER_IDENTITY,
+      contracts: declaredContracts(
+        "binja",
+        sources.binjaProvider.BINJA_OPERATIONS,
+      ),
+    },
+    {
       identity: sources.nativeProvider.NATIVE_MACOS_PROVIDER_IDENTITY,
       contracts: sources.nativeContracts.NATIVE_TOOL_CONTRACTS,
     },

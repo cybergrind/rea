@@ -36,7 +36,7 @@ is within the authorized scope, use `npx -y rea-agents@latest` in its place.
 Configuration repair starts with a read-only setup plan; show paths, backups and
 skill replacement before applying authorized changes. Preserve existing approval
 and target-execution boundaries. REA setup never installs or upgrades unrelated
-software, including Node.js, npm, Homebrew, Java, Ghidra, IDA, JADX, Binwalk or Unblob.
+software, including Node.js, npm, Homebrew, Java, Ghidra, IDA, Binary Ninja, JADX, Binwalk or Unblob.
 
 ## Route the target first
 
@@ -100,6 +100,16 @@ Proceed directly to `analyze_function`, pseudocode, or function/string searches
 after opening; IDA does not supply `binary_overview`. Consult session availability
 when composing broader workflows. Modern direct callers and unsupported dossier
 facets remain unknown; live IDA results are not replayed from snapshots.
+
+For a running Binary Ninja with `REA_BINJA_MCP_URL` set, use `open_binary` with
+the original input binary and `provider_id: "binja"`; do not pass a `.bndb`
+database. The adapter analyzes the view that is active in Binary Ninja and
+fails when that view does not hold the target or changes mid-session. It is
+read-only and never opens, saves, or closes an item. Prefer function-scoped
+tools and ASCII literal searches on large binaries; whole inventories are
+complete and therefore large. `xrefs` on a data address reports data references
+only. See the
+[Binary Ninja provider guide](https://github.com/morluto/rea/blob/main/docs/binja-provider.md).
 
 If the user says only "my app" without a name, path, or target already selected
 for this task, ask which app before searching for artifacts. Paths in unrelated

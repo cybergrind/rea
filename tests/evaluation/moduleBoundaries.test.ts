@@ -35,6 +35,7 @@ describe("binary production construction ownership", () => {
     "hopper/HopperProvider.js",
     "ghidra/GhidraProvider.js",
     "ida/IdaProvider.js",
+    "binja/BinjaProvider.js",
     "artifacts/ArtifactProvider.js",
     "dotnet/ManagedStaticProvider.js",
     "native/NativeMacOSProvider.js",

@@ -73,7 +73,7 @@ The process-global Vitest configuration contract rejects new direct temporary-ro
 creation outside the workspace seam and its narrowly documented boundary/package
 exceptions.
 
-Real Hopper, Ghidra, IDA, browser, package, and managed-code claims belong to their
+Real Hopper, Ghidra, IDA, Binary Ninja, browser, package, and managed-code claims belong to their
 explicit `npm run verify:*` lanes. The reconstruction-readiness lane also
 checks deterministic rerun, tamper, and stale-input handling; those checks do
 not execute extracted JavaScript modules. When application runtime behavior is
@@ -742,6 +742,29 @@ establish real IDA operation. The initial real workflows cover legacy upstream
 `c133c3853faa111a9b00ee615c013b720d0c4acd` with Windows x64 IDA 9.3.
 Linux/macOS headless, modern attached GUI tools, other engine versions and
 architectures remain unverified; see the [provider guide](ida-provider.md).
+
+## Binary Ninja MCP adapter
+
+`npm run verify:binja -- --target /absolute/path/to/program --procedure 0x401000`
+uses a running Binary Ninja at `REA_BINJA_MCP_URL` whose active view holds the
+target. It installs and starts nothing, and it opens, saves, closes, and
+activates nothing. The lane invokes the production CLI dispatcher and connects
+the pinned MCP client SDK to the production REA server. It verifies function
+Evidence and CLI/MCP parity, function and address operations, malformed input,
+a refused mutation, and that the open items, their unsaved-change flags, and
+the active view are the same afterwards. Whole-database inventories run only
+with `--inventories`. `--report` writes private local observations with mode
+`0600`; the console summary contains no target paths or upstream output.
+
+Adapter tests cover reply parsing, pagination, target binding, active-view and
+image-base changes, cancellation, the read-only tool authority, search
+preselection, string decoding, and the operator tooling's lock, queue, and
+never-overwrite rules. Their producer fixture reproduces reply shapes observed
+from `binaryninja_ui_mcp` 0.1.0 with synthetic contents; replies of the three
+state-changing tools the database tool calls were not observed. None of this
+establishes real Binary Ninja operation: until `verify:binja` has been run and
+recorded for an engine version and host, real-provider coverage is unverified.
+See the [provider guide](binja-provider.md).
 
 ## DOS Ghidra analysis
 

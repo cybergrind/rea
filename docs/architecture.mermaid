@@ -32,6 +32,8 @@ graph TD
         GHIDRA["src/ghidra/<br/>Ghidra discovery, profile & function analysis<br/>snapshot, Unix/Windows transport, bounded lifecycle"]
         IDA["src/ida/<br/>Upstream MCP contract adaptation<br/>live GUI binding or owned headless database"]
         IDA_MCP["External ida-pro-mcp<br/>GUI proxy or database supervisor<br/>upstream installation and engine lifecycle"]
+        BINJA["src/binja/<br/>Binary Ninja MCP reply adaptation<br/>read-only binding to the active GUI view"]
+        BINJA_MCP["External Binary Ninja MCP server<br/>caller-started GUI and its database"]
         AUX["src/artifacts/ + src/native/<br/>artifact inventory and extraction<br/>format readers and native capabilities"]
         BROWSER["src/browser/<br/>CDP / Playwright capture<br/>captured scripts and native module resolution<br/>execution/: coverage, listener and source attribution"]
         JS_CODEC["src/javascript/sourceMaps/<br/>pinned upstream map codec<br/>owned heap-limited Node process, complete point evidence"]
@@ -100,10 +102,14 @@ graph TD
     COMPOSITION --> HOPPER
     COMPOSITION --> GHIDRA
     COMPOSITION --> IDA
+    COMPOSITION --> BINJA
     COMPOSITION --> AUX
     IDA --> IDA_MCP
     IDA --> CONTRACTS
     IDA --> DOMAIN
+    BINJA --> BINJA_MCP
+    BINJA --> CONTRACTS
+    BINJA --> DOMAIN
     SESSION --> AUX
     APP --> JS_RECON
     APP --> INSTALL
@@ -141,6 +147,7 @@ graph TD
     TESTS -.-> HOPPER
     TESTS -.-> GHIDRA
     TESTS -.-> IDA
+    TESTS -.-> BINJA
     TESTS -.-> PROCESS
     TESTS -.-> BROWSER
     TESTS -.-> EVALUATION
