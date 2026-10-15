@@ -154,6 +154,11 @@ explicit path or endpoint and do not need it.
   use focused analysis tools directly; call `binary_overview` when metadata or
   inventory context is useful and available from the selected provider.
 
+When IDA or Binary Ninja is configured and already holds the user's analysis
+of the target, prefer that provider: it reuses finished analysis and the
+analyst's names, while a new Ghidra session repeats the analysis. Binary
+Ninja serves one caller at a time and nothing until its analysis is idle.
+
 For an existing IDA MCP configuration, use `open_binary` with the original
 input binary and `provider_id: "ida"`; do not pass an `.idb` or `.i64` database.
 The legacy attached profile binds the already-open GUI input by SHA-256 and

@@ -21,7 +21,7 @@ The prefix is part of the stored name. A tier noted only in a comment or a
 report doesn't show in listings, cross-references or pseudocode.
 
 Promote a name only when new evidence meets the confirmed row. A plausible
-name with weak evidence misleads the next analyst more than `sub_` does.
+name stored without its prefix misleads the next analyst more than `sub_` does.
 For code matched to an upstream project, use its symbol names and record the
 project and version in the comment (see
 [native and artifacts](native-and-artifacts.md#identify-embedded-open-source-code)).
@@ -57,9 +57,28 @@ image start. A later session reads that comment and the ledger, lists the
 user-defined names and types, and continues from the open questions. Writes
 listed in the ledger but missing from the database were never saved.
 
+## Write as you go
+
+Annotate each function when you finish analyzing it, before moving to the
+next. Its names and types then show in the pseudocode and cross-references of
+everything you read afterwards, and a run that stops early still leaves its
+results.
+
+1. Write what the function supports, at its tier: a plain name if confirmed,
+   `maybe_` and a comment if inferred, a comment alone if only part of its role
+   is known. Every function you analyzed leaves at least a comment.
+2. In the same batch, apply types whose layout is confirmed. Read the batch
+   back.
+3. When time or context runs short, stop analyzing and do the final pass on
+   what exists. A run never ends with its findings only in the report.
+
+Final pass: promote or demote each `maybe_` name with the evidence you now
+have, make names consistent, read back table-like batches, and update the
+ledger.
+
 ## Verify writes and keep the log from tool results
 
-- Batch related writes, then read the changed state back: name, comment,
+- Batch each function's writes, then read the changed state back: name, comment,
   prototype or type at each target. For named tables or constants, compare each
   name with the bytes it labels.
 - Build the write log from the tool results or a call journal: target, old

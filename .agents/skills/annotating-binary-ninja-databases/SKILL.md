@@ -67,7 +67,7 @@ Before finishing:
 
 1. Update the ledger (the path the user gave, else the report directory):
    goal, each question with status and Evidence, the write log rendered from
-   the journal, open items, next steps.
+   the journal, open items including deferred proposals, next steps.
 2. Set the index comment at `start`:
    `REA ledger: <absolute path>. Updated <date>. Open: <question ids>.`
 3. Tell the user the writes stay unsaved until they save the database.
@@ -98,6 +98,18 @@ node "$REA_CHECKOUT/scripts/rea.mjs" inspect-analysis-view rea/view.json --json
 These pages make good worker packets: they keep the parent Evidence ID. With
 REA's MCP tools, a client that saves an oversized `analyze_function` result to a
 file still gives you the Evidence ID; page `inspect_analysis_view` from there.
+
+## Annotate per function
+
+Follow "Write as you go" in `annotation-practices.md`. Before following a call
+tree, list the functions in scope in the ledger, nearest first, and keep each
+one's status current: when the run stops, that list is what remains. For each
+function:
+
+1. Write its name, comment, types and prototype through `bn.sh` (recipes below).
+2. `bash scripts/bn.sh bn_analysis_update_and_wait`, then read back with
+   `bn_symbol_list_at`, `bn_comment_get` and `bn_function_prototype_get`.
+3. Move on; REA answers again once analysis is idle.
 
 ## Write recipes (arguments verified against the server)
 
@@ -186,3 +198,4 @@ against their bytes via `bn_memory_read`). Report any mismatch.
 | Building on earlier annotations without checking them    | Treat them as claims; read back the ones you rely on                                                     |
 | Several agents calling Binary Ninja                      | Workers read saved files; only the lead calls `bn.sh`                                                    |
 | Saving, closing or switching the database                | Never; `bn.sh` refuses, and the user saves when satisfied                                                |
+| Analyzing the whole call tree before writing anything    | Annotate per function; a run that stops early then still leaves its results                              |
