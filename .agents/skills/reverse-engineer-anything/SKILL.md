@@ -2,7 +2,7 @@
 name: reverse-engineer-anything
 description: Reverse engineer native, managed, Electron/JavaScript, packaged, firmware, and browser targets with REA. Use shipped-artifact or requested runtime evidence to explain features, compare versions, decompile code, or guide a reconstruction. Skip REA for ordinary source-repository architecture analysis.
 metadata:
-  version: "42"
+  version: "43"
 ---
 
 # REA
@@ -280,8 +280,11 @@ For requests that span multiple features or subsystems, use a staged workflow:
    available and the questions do not depend on one another, give each a
    distinct scope (one function, branch or question) and its inputs as saved
    files or retained Evidence IDs, sized to the worker model's context: give
-   line or address ranges rather than whole files. A small, fast model suits a
-   narrow, well-specified scope. Workers return claims with evidence locations,
+   line or address ranges rather than whole files. Include one fact you
+   already verified in that scope for the worker to reproduce first; a miss
+   points to the inputs or method, not just the worker. A small, fast model
+   suits a narrow, well-specified scope. If the client has no small model,
+   an installed agent CLI run headless with read-only tools can be the worker. Workers return claims with evidence locations,
    confidence and unverified parts, and don't write to analysis databases.
    Only the lead calls a provider that serves one request at a time, such as
    Binary Ninja. Check each worker claim against its cited evidence before

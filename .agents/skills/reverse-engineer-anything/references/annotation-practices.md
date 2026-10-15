@@ -48,6 +48,15 @@ another analyst, carry unknown evidence. Before building on one, check it as
 you would a new write: read the code or bytes it describes (for named tables,
 compare each name with its values). Record any correction with its evidence.
 
+## Leave a starting point for the next session
+
+A saved database is the next session's input. Keep a ledger file with the
+goal, each question and its status, the annotations with their evidence, and
+the next steps, and point to it from a comment at a fixed address, such as the
+image start. A later session reads that comment and the ledger, lists the
+user-defined names and types, and continues from the open questions. Writes
+listed in the ledger but missing from the database were never saved.
+
 ## Verify writes and keep the log from tool results
 
 - Batch related writes, then read the changed state back: name, comment,

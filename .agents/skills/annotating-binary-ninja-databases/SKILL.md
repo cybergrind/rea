@@ -34,6 +34,44 @@ Sub-agents work from saved files (see Workers below). REA refuses requests while
 analysis isn't idle, so finish a write batch with `bn_analysis_update_and_wait`
 before going back to REA.
 
+## Resume and hand off
+
+A saved database keeps names, types, prototypes and comments, and REA's
+`binja` results show the names and types live. Binary Ninja can't list
+comments or open questions, so a ledger file carries those, and a comment at
+the view's start address points to it.
+
+At the start of every session:
+
+1. Read the index: `start` from `bash scripts/bn.sh bn_binary_view_info`, then
+   `bn_comment_get {"comment":"<start>"}`. If it names a ledger that exists,
+   read it: goal, questions with status, annotations, next steps.
+2. Inventory user annotations into files (under a second for a few thousand
+   symbols):
+   ```bash
+   for t in symbol type; do o=0; while [ "$o" != null ]; do
+     out=$(bash scripts/bn.sh bn_${t}_list "{\"limit\":1000,\"offset\":$o}"); printf '%s\n' "$out" >> work/${t}s.md
+     o=$(sed -n 's/^nextOffset: //p' <<<"$out"); [ -n "$o" ] || break
+   done; grep '| false |$' work/${t}s.md > work/user-${t}s.md; done
+   ```
+   Rows ending `| false |` are user-defined. Read comments at user symbols and
+   ledger addresses with `bn_comment_get`, also into a file.
+3. Reconcile. A ledger write missing from the database was never saved: redo
+   it only if its evidence still holds. A user annotation missing from the
+   ledger is someone else's claim. `maybe_` names are the queue for
+   confirmation.
+4. Plan from the ledger's open questions. Check the earlier results you build
+   on; don't re-derive answered questions otherwise.
+
+Before finishing:
+
+1. Update the ledger (the path the user gave, else the report directory):
+   goal, each question with status and Evidence, the write log rendered from
+   the journal, open items, next steps.
+2. Set the index comment at `start`:
+   `REA ledger: <absolute path>. Updated <date>. Open: <question ids>.`
+3. Tell the user the writes stay unsaved until they save the database.
+
 ## Evidence for names
 
 - **Confirmed function name:** one REA `analyze_function` record for that
@@ -99,20 +137,39 @@ re-running a batch leaves no-op entries marked `changed: false`.
    address ranges for anything larger, and tell the worker to read in ranges
    (`sed -n`, offset/limit). A worker that reads whole assembly or source
    files overflows a small model.
-2. One worker per function or branch, on a small model (Claude Code: `model: "haiku"`).
-   Workers get file paths only: no Binary Ninja access, no writes. If the
-   requested model isn't available, say so and name the substitute.
+   Give addresses as Binary Ninja shows them. A worker that reads raw file
+   bytes gets the segment's address and file offset copied from a tool result
+   (not a formula you wrote), plus an anchor: one fact you already verified
+   in its scope, such as a known call site, that it must reproduce first.
+2. One worker per function or branch, on a small model. Claude Code: the
+   Agent tool with `model: "haiku"`. Other clients, when the `claude` CLI is
+   installed: one read-only headless process per worker, run from the checkout
+   so packet paths resolve:
+
+   ```bash
+   claude -p --model claude-haiku-5-5 --tools "Read,Grep,Glob" --strict-mcp-config \
+     --disable-slash-commands --output-format json "$(cat work/w1-prompt.md)" > work/w1.json &
+   ```
+
+   `--tools` leaves no shell or write tool and `--strict-mcp-config` no MCP
+   server, so the worker can't reach Binary Ninja or run a decoder: put
+   disassembly in the packet. Start several with `&`, then `wait`; read
+   `.result`, and `.modelUsage` names the model that ran. Workers get file
+   paths only: no Binary Ninja access, no writes. If no small model is
+   reachable, say so and name the substitute.
+
 3. Each worker returns proposals: `target | kind (name/comment/type/prototype) | value | evidence addresses | tier (confirmed/inferred) | UNVERIFIED parts`.
-4. Lead checks every proposal against raw evidence, then writes. Record rejections and corrections in the findings report.
+4. Lead checks every proposal against raw evidence, then writes. Record rejections and corrections in the findings report. If a worker missed its anchor or its claims are off by one constant, check the packet before blaming the worker.
 
 ## Write log
 
 The journal is the write log; don't write it from memory. Render it with:
 
 ```bash
-jq -r 'select(.changed != false)|[.ts,.tool,(.args|tostring),.rc,(.before|gsub("\n";" ")|.[0:160]),(.after|gsub("\n";" ")|.[0:160])]|@tsv' "$BN_JOURNAL"
+jq -r 'select(.rc == 0 and .changed != false)|[.ts,.tool,(.args|tostring),.rc,(.before|gsub("\n";" ")|.[0:160]),(.after|gsub("\n";" ")|.[0:160])]|@tsv' "$BN_JOURNAL"
 ```
 
+List failed writes with `select(.rc != 0)` and report each one.
 Before finishing, read back every table-like batch (e.g. named constants
 against their bytes via `bn_memory_read`). Report any mismatch.
 

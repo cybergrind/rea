@@ -34,7 +34,13 @@ CLIENT="$REA_CHECKOUT/scripts/binja-database.mjs"
 tool="${1:-}"
 args="${2:-}"
 [ -n "$args" ] || args='{}'
-[ -n "$tool" ] || { echo "usage: bash bn.sh TOOL [JSON]" >&2; exit 2; }
+SKILL_MD="$(readlink -f "$(dirname "$self")/../SKILL.md")"
+case "$tool" in
+  ""|-h|--help|help)
+    echo "usage: bash bn.sh TOOL [JSON]"
+    echo "Tool names and exact arguments: 'Write recipes' and 'Read notes' in $SKILL_MD"
+    [ -n "$tool" ] && exit 0; exit 2 ;;
+esac
 [ -f "$CLIENT" ] && [ -d "$REA_CHECKOUT/dist" ] || {
   echo "bn.sh: no built REA checkout at '$REA_CHECKOUT'; set REA_CHECKOUT, or run npm run build:cached there" >&2
   exit 2
@@ -103,6 +109,7 @@ if [ "$write" = 1 ]; then
 fi
 
 out=$(call "$tool" "$args"); rc=$?
+[ "$rc" = 0 ] || echo "bn.sh: $tool failed; check its name and arguments in 'Write recipes' or 'Read notes': $SKILL_MD" >&2
 
 if [ "$write" = 1 ]; then
   after=$(snapshot "$p")
