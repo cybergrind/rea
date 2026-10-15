@@ -112,6 +112,29 @@ operation's full ordered list. Candidate capabilities describe possible
 providers. Top-level session capabilities describe the current route, and
 `analysis_provider_binding` identifies the selected provider.
 
+## Identify embedded open-source code
+
+Stripped binaries often embed open-source libraries: codecs, compression,
+crypto, parsers, runtimes. Recognizing one gives names and types that structure
+alone can't. Check for it before inventing names for a cluster of functions:
+
+1. Find candidates from identifying strings (version banners, thread names,
+   assertion paths, error text) and imported or exported symbols.
+2. Confirm with structure, not names alone: constant tables matched value for
+   value, dispatch or registration tables whose slot layout matches the
+   project's, stack-frame sizes, and control flow compared with the upstream
+   function.
+3. Pin the reference. Prefer a version string observed in the binary. With
+   source obtained within the user's scope, `rea import-reference-source` (CLI)
+   records its file hashes and Git HEAD. If the version can't be pinned, record
+   it as an unknown and note where the code differs from the version compared.
+4. Name matched code with upstream identifiers as confirmed names; follow
+   [annotation practices](annotation-practices.md).
+
+Upstream source is reference evidence, separate from observations of the
+target. A match doesn't prove that unexamined functions came from the same
+version.
+
 ## DOS MZ with Ghidra
 
 For an admitted DOS MZ target, use `inspect_native_load_image` to check measured
@@ -231,7 +254,7 @@ and Cortex-M variants are unsupported. See [raw binary guide](https://github.com
 
 ### Function annotations in Ghidra
 
-Use `annotate_native_function` for one function name and/or entry comments, with at least one explicit change. Review its annotation readback and refreshed dossier inline. Changes are atomic and session-scoped; empty comments clear them, omitted fields preserve them. Later MCP calls observe edits until close. CLI `annotate-native-function` returns the updated analysis before discarding the session. Original executable bytes are unchanged; edits invalidate immutable snapshots. Windows P0 does not admit database mutations. For naming only, `set_address_name` / `set_addresses_names` also work with Ghidra: they name function entries or data addresses (primary labels) and return compact per-address success booleans instead of a dossier.
+Use `annotate_native_function` for one function name and/or entry comments, with at least one explicit change. Review its annotation readback and refreshed dossier inline. Changes are atomic and session-scoped; empty comments clear them, omitted fields preserve them. Later MCP calls observe edits until close. CLI `annotate-native-function` returns the updated analysis before discarding the session. Original executable bytes are unchanged; edits invalidate immutable snapshots. Windows P0 does not admit database mutations. For naming only, `set_address_name` / `set_addresses_names` also work with Ghidra: they name function entries or data addresses (primary labels) and return compact per-address success booleans instead of a dossier. Choose names, comments and evidence tiers by [annotation practices](annotation-practices.md).
 
 ## Offline PE resource inventory
 

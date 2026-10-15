@@ -4,7 +4,8 @@ Read this guide only for an observed connection, command, approval or provider
 blocker. Keep the user's target and question in view. Explain what prevented the
 operation and the next useful step; after repair, continue the investigation.
 
-Commands below use an installed `rea`. If none is available, use the package
+Commands below use an installed `rea`. In a built REA source checkout, use
+`node scripts/rea.mjs` instead. If neither is available, use the package
 invocation in `SKILL.md` when acquiring REA is authorized. Follow the connected
 server's schemas and the installed CLI's help rather than assuming repository
 main and an older release expose the same arguments.
@@ -13,7 +14,7 @@ main and an older release expose the same arguments.
 
 | Observation                                                     | Meaning and next step                                                                                                                                                                                                                                                                                                 |
 | --------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| No REA tools in the active session                              | Inspect registration with `rea doctor --client codex --json`. A skill installation alone does not register MCP.                                                                                                                                                                                                       |
+| No REA tools in the active session                              | Inspect registration with `rea doctor --client codex --json`. A skill installation alone does not register MCP. Until registration is repaired, continue through the CLI; label observations from other tools as such.                                                                                                |
 | Missing, malformed or stale registration                        | Prepare a scoped setup plan; apply only authorized changes with backups.                                                                                                                                                                                                                                              |
 | Aligned registration, but no connected tools                    | Restart/reconnect the client. Doctor checks registration; it cannot establish the current agent's connection. Inspect the client's launch error if reconnection fails.                                                                                                                                                |
 | `MCP tool call requires approval, but approval policy is never` | Codex rejected the call before REA executed it. Do not install an engine or repeat setup to solve this client-policy decision. See the approval section below.                                                                                                                                                        |

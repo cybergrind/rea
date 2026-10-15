@@ -2,7 +2,7 @@
 name: reverse-engineer-anything
 description: Reverse engineer native, managed, Electron/JavaScript, packaged, firmware, and browser targets with REA. Use shipped-artifact or requested runtime evidence to explain features, compare versions, decompile code, or guide a reconstruction. Skip REA for ordinary source-repository architecture analysis.
 metadata:
-  version: "41"
+  version: "42"
 ---
 
 # REA
@@ -22,8 +22,9 @@ If REA tools are available and their registration is not known to be stale,
 proceed directly to the target. Do not run diagnostics or setup before every
 investigation. Use the connected server's actual tool list and input schemas;
 a skill installed from repository main may describe capabilities absent from
-an older npm release. Keep complete inline Evidence when that server does not
-advertise retained references.
+an older npm release. When the client defers MCP schemas behind a tool search
+or loader, load a tool's schema before its first call. Keep complete inline
+Evidence when that server does not advertise retained references.
 
 If tools are absent, a call is blocked by the client, or a required provider is
 unavailable, read [connection and recovery](references/connection-and-recovery.md).
@@ -31,8 +32,13 @@ Diagnose the observed blocker, continue useful supported work, and resume the
 original task after repair. Client approval, shell PATH, registration and engine
 availability have different remedies; avoid repeating setup for all of them.
 
-Prefer an existing `rea` CLI. When none is installed and REA package acquisition
-is within the authorized scope, use `npx -y rea-agents@latest` in its place.
+Prefer an existing `rea` CLI. In a built REA source checkout, its public
+launcher `node scripts/rea.mjs` serves as the CLI for that checkout's version.
+When neither exists and REA package acquisition is within the authorized scope,
+use `npx -y rea-agents@latest` in its place. Acquisition is in scope when the
+user asked for REA analysis and the host permits package downloads; otherwise
+ask once. Without registered REA tools, continue through one of these CLIs
+rather than bypassing REA.
 Configuration repair starts with a read-only setup plan; show paths, backups and
 skill replacement before applying authorized changes. Preserve existing approval
 and target-execution boundaries. REA setup never installs or upgrades unrelated
@@ -230,7 +236,9 @@ containment relationships even after summary analysis.
 
 Every conclusion must distinguish observations, inferences, and unknowns. Cite
 Evidence IDs, preserve limitations and incomplete coverage, and never imply
-that static analysis observed execution. Runtime requests execute the declared
+that static analysis observed execution. For facts from outside REA, such as a
+disassembler GUI, a shell tool or upstream source, name that source and its
+version instead of an Evidence ID. Runtime requests execute the declared
 target and lifecycle; do not broaden the target or action beyond those fields.
 
 Within the user's requested investigation, call available analysis tools
@@ -246,26 +254,39 @@ For requests that span multiple features or subsystems, use a staged workflow:
 1. Turn the request into a checklist of questions and the evidence each answer
    needs. Resolve target identity and constraints from the conversation and
    workspace before asking for information again.
-2. Inspect the current REA session, artifact identity, saved analysis database,
+2. Check the request's own premises before building on them. Confirm that each
+   supplied address is what the request says it is (instruction boundary,
+   function entry, call site) and that named functions, strings and versions
+   exist. Report a mismatch with the decode or listing that shows it, then
+   continue from the corrected fact.
+3. Inspect the current REA session, artifact identity, saved analysis database,
    bookmarks, and prior evidence. Reuse matching state; do not open duplicate
    sessions or repeat identical analysis.
-3. Start with the smallest useful overview or inventory. Follow each question
+4. Start with the smallest useful overview or inventory. Follow each question
    from its entry point through relevant data and state changes to its result.
    Batch related operations around a specific hypothesis, then expand only when
-   the returned evidence leaves a concrete gap.
-4. Inspect relevant packaged resources and configuration alongside code when
+   the returned evidence leaves a concrete gap. For stripped native code, check
+   for [embedded open-source libraries](references/native-and-artifacts.md#identify-embedded-open-source-code)
+   before inventing names.
+5. Inspect relevant packaged resources and configuration alongside code when
    they affect the question. Use format-aware inventory and parsers; do not
    infer behavior from filenames, strings, or layout alone.
-5. Corroborate a conclusion with the evidence type it requires. Use runtime
+6. Corroborate a conclusion with the evidence type it requires. Use runtime
    observation only when static evidence cannot answer the question and the
    required host runtime and OS access are available. For JavaScript behavior,
    run probes against the actual app through the available browser, Electron,
    or process capture workflow.
-6. Decompose work into independent questions. When parallel workers are
-   available and the questions do not depend on one another, assign distinct
-   scopes, point workers to existing evidence, and ask them to return sources,
-   conclusions, and unresolved gaps. Otherwise, work sequentially.
-7. Keep a concise finding ledger linking each conclusion to Evidence IDs,
+7. Decompose work into independent questions. When parallel workers are
+   available and the questions do not depend on one another, give each a
+   distinct scope (one function, branch or question) and its inputs as saved
+   files or retained Evidence IDs, sized to the worker model's context: give
+   line or address ranges rather than whole files. A small, fast model suits a
+   narrow, well-specified scope. Workers return claims with evidence locations,
+   confidence and unverified parts, and don't write to analysis databases.
+   Only the lead calls a provider that serves one request at a time, such as
+   Binary Ninja. Check each worker claim against its cited evidence before
+   reporting or applying it. Otherwise, work sequentially.
+8. Keep a concise finding ledger linking each conclusion to Evidence IDs,
    confidence/evidence type, search boundary, and remaining unknowns. Update
    the shared index or investigation report so later passes can reuse results.
 
@@ -286,6 +307,8 @@ as complete while required questions remain open.
   [references/runtime-observation.md](references/runtime-observation.md)
 - Evidence paging, comparisons, residual unknowns, and verification:
   [references/evidence-workflows.md](references/evidence-workflows.md)
+- Names, comments and types left in an analysis database:
+  [references/annotation-practices.md](references/annotation-practices.md)
 
 ## Finish the task
 

@@ -20,7 +20,7 @@ rea function /absolute/path/to/program main --json
 | `REA_BINJA_MCP_URL`        | MCP endpoint. Required: the provider is not configured without it. It must be `http` or `https` on `127.0.0.1` or `[::1]`, without credentials, query, or fragment. |
 | `REA_BINJA_MCP_TIMEOUT_MS` | Deadline of one MCP request. Default `900000`.                                                                                                                      |
 
-There is no default endpoint. A default would make Binary Ninja a second usable candidate on every host that also has Ghidra or Hopper, and automatic provider selection refuses to choose between two.
+REA has no default endpoint, although the examples here use `127.0.0.1:24642`; set the address your Binary Ninja MCP server reports. A default would make Binary Ninja a second usable candidate on every host that also has Ghidra or Hopper, and automatic provider selection refuses to choose between two.
 
 `rea doctor --provider binja --json` checks the setting without connecting. For guided registration, set `REA_BINJA_MCP_URL` before `rea setup --client <client>`; setup shows the variable in its plan and keeps it after approval.
 
